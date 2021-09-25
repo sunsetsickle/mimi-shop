@@ -1,0 +1,11 @@
+步骤
+1）新建Maven工程
+2）修改目录，修改pom.xml文件
+3）添加SSM框架的所有依赖
+4）添加jdbc.porperties到resources的目录下
+5）新建applicationContext_dao.xml文件，进行数据访问层的配置
+6）新建applicationContext_service.xml文件，进行业务逻辑层的配置
+7）新建springMVC.xml文件。配置mvc的框架
+8）新建SqlMapConfig.xml文件。进行分页插件的配置
+9）逆向工程
+10）
