@@ -25,10 +25,12 @@
                     $("#imgDiv").empty();  //清空原有数据
                     //创建img 标签对象
                     var imgObj = $("<img>");
+
                     //给img标签对象追加属性
                     imgObj.attr("src","/image_big/"+obj.imgurl);
                     imgObj.attr("width","100px");
                     imgObj.attr("height","100px");
+
                     //将图片img标签追加到imgDiv末尾
                     $("#imgDiv").append(imgObj);
                     //将图片的名称（从服务端返回的JSON中取得）赋值给文件本框
@@ -62,6 +64,7 @@
 							<td class="four"></td>
 							<td><span id="pnameerr"></span></td>
 						</tr>
+
 						<tr>
 							<td class="one">商品介绍</td>
 							<td><input type="text" name="pContent" class="two"></td>

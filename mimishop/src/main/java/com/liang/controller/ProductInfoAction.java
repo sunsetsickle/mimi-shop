@@ -1,19 +1,22 @@
 package com.liang.controller;
 
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
+
 import com.github.pagehelper.PageInfo;
 import com.liang.pojo.ProductInfo;
 import com.liang.service.ProductInfoService;
 import com.liang.utils.FileNameUtil;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +63,8 @@ public class ProductInfoAction {
 
     @ResponseBody
     @RequestMapping("/ajaxImg")
-    public Object ajaxImg(MultipartFile pimage, HttpServletRequest request) {//pimage:和前端file组件id和name一致
+    public String ajaxImg(MultipartFile pimage, HttpServletRequest request, HttpServletResponse response) {//pimage:和前端file组件id和name一致
+
         //提取生成文件名UUID+上传图片的后缀
         saveFileName = FileNameUtil.getUUIDFileName() + FileNameUtil.getFileType(pimage.getOriginalFilename());
 
@@ -75,6 +79,7 @@ public class ProductInfoAction {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         //返回客户端JSON对象，封转图片的路径，为了在页面实现回显
         JSONObject object = new JSONObject();
         object.put("imgurl", saveFileName);
@@ -99,8 +104,48 @@ public class ProductInfoAction {
             request.setAttribute("msg","添加失败！");
         }
 
+        //saveFileName是全局变量，这次使用完毕后需要清空，为了下次的使用
+        saveFileName="";
+
         //然后重新访问数据库，所以跳转到分页显示的action上
         return "forward:/prod/split.action";
+    }
 
+    @RequestMapping("/one")
+    public String one(int pid, Model model){
+         ProductInfo info= productInfoService.getById(pid);
+
+         model.addAttribute("prod",info);
+
+        return "update";
+    }
+
+    @RequestMapping("/update")
+    public String update(ProductInfo info,HttpServletRequest request){
+
+        //因为ajax的异步图片上传，则saveFileName里有上传上来的图片名称，
+        // 如果没有使用，则saveFileName="";
+        //实体类info使用隐藏表单域提供的pImage原始图片名
+        if (!saveFileName.equals("")){
+            info.setpImage(saveFileName);
+        }
+        int num=-1;
+
+        try {
+            num=productInfoService.update(info);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (num>0){
+            //此时说明更新成功
+            request.setAttribute("msg","更新成功");
+
+        }else{
+            request.setAttribute("msg","更新失败");
+        }
+
+        //处理完毕后，savaFileName还可能有数据，
+        saveFileName="";
+        return "forward:/prod/split.action";
     }
 }
